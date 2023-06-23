@@ -22,5 +22,5 @@ Please note that additional configuration or setup steps may be required dependi
  requirements.
 
 ## Useful Links
-- Block Explorer: [https://xorscan.xoracle.io](https://xorscan.xoracle.io/)
+- Block Explorer: [https://explorer.xoracle.io](https://explorer.xoracle.io/)
 - RPC Endpoint: [https://rpc.xoracle.io](https://rpc.xoracle.io)
