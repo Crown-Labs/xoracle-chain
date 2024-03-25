@@ -1,0 +1,6 @@
+# Data
+datadir
+consensus
+
+# Secret
+config/jwtsecret
