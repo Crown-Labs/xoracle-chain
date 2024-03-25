@@ -21,7 +21,7 @@ services:
       --datadir "datadir"
       --port 30456
       --bootnodes "enode://c55258be72cd401bc5876a6cfb97b51415e96217921387096f73cf1eaa90e751230efe91f90107677578ed14f6b56010c5c44e7dbf589e3e8b692857dd90da1c@148.251.126.94:30456,enode://e2ae9505eaa95ad184a7e4b46f977bedd5e8df2b8a6896fe4354dda649bd13bf59099a394bee44b330d4c65ab677a3da4f7def52ecd42f4d3c0d63ae800d38d3@176.9.34.155:30456,enode://0e827b8180e4c40648804f9173f6fd9b509e2536b5f4be0b11ec403291699ec1d3613a14e4562025773ec8434169b3a82b07f506dbb8ef461790c24e6596a708@195.201.63.145:30456"
-      --http --http.addr "0.0.0.0" --http.port 8545 --http.corsdomain "*" --http.vhosts "*" --http.api "eth,net,web3,txpool,clique"
+      --http --http.addr "0.0.0.0" --http.port 8545 --http.corsdomain "*" --http.vhosts "*" --http.api "eth,net,web3,txpool"
       --ws --ws.addr "0.0.0.0" --ws.port 8546 --ws.origins "*" --ws.api "net,web3,eth"
       --authrpc.vhosts *
       --authrpc.addr 0.0.0.0
