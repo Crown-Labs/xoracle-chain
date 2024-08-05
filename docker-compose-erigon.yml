@@ -6,8 +6,6 @@ services:
     ports:
       - 30456:30456
       - 8545:8545
-      - 8546:8546
-      - 8551:8551
     command: >
       --datadir /datadir
       --networkid 1123581321
