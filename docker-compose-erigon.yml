@@ -22,8 +22,11 @@ services:
       --http.corsdomain="*"
       --http.vhosts="*"
       --ws
+      --config /config/erigon.yaml
     volumes:
       - "./datadir:/datadir"
+      - ./config/erigon.yaml:/config/erigon.yaml
+      - 
       - type: bind
         source: ./config/jwtsecret
         target: /config/jwtsecret
