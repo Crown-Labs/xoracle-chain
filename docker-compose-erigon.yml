@@ -2,7 +2,7 @@ version: "3.8"
 services:
   xor-erigon:
     container_name: xor-erigon
-    image: thorax/erigon:latest
+    image: thorax/erigon:v2.60.4
     ports:
       - 30456:30456
       - 8545:8545
