@@ -15,7 +15,7 @@ docker run --rm -it -v $PWD:/xor -v $PWD/config/genesis.json:/config/genesis.jso
 
 For erigon:
 ```bash
-docker run --rm -it -v $PWD:/erigon -w /erigon thorax/erigon:latest --datadir /erigon/datadir init ./config/genesis.json
+docker run --rm -it -v $PWD:/erigon -w /erigon thorax/erigon:v2.60.4 --datadir /erigon/datadir init ./config/genesis.json
 ```
 
 ### Step 2: Create the jwt secret
