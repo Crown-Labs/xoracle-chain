@@ -10,7 +10,12 @@ The xOracle chain is a public blockchain with consensus `Proof of Stake with Aut
 To initialize the genesis.json file, perform the following command:
 
 ```bash
-docker run --rm -it -v $PWD:/xor -v $PWD/config/genesis.json:/config/genesis.json -w /xor ethereum/client-go:latest --datadir datadir init /config/genesis.json
+docker run --rm -it -v $PWD:/xor -v $PWD/config/genesis.json:/config/genesis.json -w /xor ethereum/client-go:v1.12.0 --datadir datadir init /config/genesis.json
+```
+
+For erigon:
+```bash
+docker run --rm -it -v $PWD:/erigon -w /erigon thorax/erigon:latest --datadir /erigon/datadir init ./config/genesis.json
 ```
 
 ### Step 2: Create the jwt secret
