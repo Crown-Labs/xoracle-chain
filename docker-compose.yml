@@ -1,42 +1,40 @@
 version: "3.8"
 services:
-  xor-erigon:
-    container_name: xor-erigon
-    image: thorax/erigon:v2.60.4
+  xor:
+    container_name: xor-full-archive
+    image: ethereum/client-go:latest
+    restart: always
+    working_dir: /xor
+    hostname: xor-full-archive
+    volumes:
+      - $PWD:/xor
+      - ./config:/config
     ports:
       - 30456:30456
       - 8545:8545
-    command: >
-      --datadir /datadir
+      - 8546:8546
+      - 8551:8551
+    command: |
       --networkid 1123581321
-      --authrpc.jwtsecret /config/jwtsecret
-      --authrpc.vhosts="*"
-      --authrpc.addr=0.0.0.0
-      --port=30456
-      --http
-      --http.port 8545
-      --http.api=debug,eth,net,trace,web3,txpool,ots,erigon,engine
-      --http.addr=0.0.0.0
-      --http.corsdomain="*"
-      --http.vhosts="*"
-      --ws
-      --config /config/erigon.yaml
-    volumes:
-      - "./datadir:/datadir"
-      - ./config/erigon.yaml:/config/erigon.yaml
-      - type: bind
-        source: ./config/jwtsecret
-        target: /config/jwtsecret
+      --syncmode "full"
+      --gcmode "archive"
+      --datadir "datadir"
+      --port 30456
+      --bootnodes "enode://c55258be72cd401bc5876a6cfb97b51415e96217921387096f73cf1eaa90e751230efe91f90107677578ed14f6b56010c5c44e7dbf589e3e8b692857dd90da1c@148.251.126.94:30456,enode://170999e79670ac182b2936a63c58a2eb6d1c1257c055290b47cc1ea5d825f52f52d82fa6fae27f67ba10c81f83d9101b1e26a9cd87ca75c783dfa011dd2ad9dd@176.9.34.155:30456,enode://0e827b8180e4c40648804f9173f6fd9b509e2536b5f4be0b11ec403291699ec1d3613a14e4562025773ec8434169b3a82b07f506dbb8ef461790c24e6596a708@195.201.63.145:30456"
+      --http --http.addr "0.0.0.0" --http.port 8545 --http.corsdomain "*" --http.vhosts "*" --http.api "eth,net,web3,txpool"
+      --ws --ws.addr "0.0.0.0" --ws.port 8546 --ws.origins "*" --ws.api "net,web3,eth"
+      --authrpc.vhosts *
+      --authrpc.addr 0.0.0.0
+      --authrpc.jwtsecret=/config/jwtsecret
     logging:
       driver: "json-file"
       options:
-        max-size: "500m"
+        max-size: "1g"
         max-file: "1"
 
   xor-beacon:
     image: sigp/lighthouse
     container_name: xor-beacon
-    restart: always
     volumes:
       - ./consensus/xor-beacon:/root/.lighthouse
       - ./config:/config
@@ -46,7 +44,7 @@ services:
     command:
       - lighthouse
       - beacon
-      - --execution-endpoint=http://xor-erigon:8551
+      - --execution-endpoint=http://xor:8551
       - --execution-jwt=/config/jwtsecret
       - --disable-peer-scoring
       - --disable-packet-filter
@@ -58,13 +56,13 @@ services:
       - --gui
       - --eth1
       - --target-peers=2
-      - --enr-address=176.9.34.155
+      - --enr-address=0.0.0.0
       - --enr-udp-port=9100
       - --enr-tcp-port=9100
       - --port=9100
       - --testnet-dir=/config
-      - --boot-nodes=enr:-MS4QFAq65XiKHgPutxlEUddypfto3s9xDCKqtapncKp8FUySmIWv10DDiWr-JhrGTyWzZ5MFRVlIm3Pq-qirKOW6ecFh2F0dG5ldHOIgAEAAAAAAACEZXRoMpD5eIIkEAAEAP__________gmlkgnY0gmlwhJT7fl6EcXVpY4IjjYlzZWNwMjU2azGhA_I84S-8OOYJ1mPqK_9LBo_yADxxrE9_jrKjmZLNZQeIiHN5bmNuZXRzAIN0Y3CCI4yDdWRwgiOM,enr:-MS4QF5WDiIklZTNVnjKhMLCDysyuHjazij18XnUPtzIPK-oEs05dUkPi5gyKDdEW4UBdEnKK1cHF0E3SXzhUjE0sjVQh2F0dG5ldHOIYAAAAAAAAACEZXRoMpD5eIIkEAAEAP__________gmlkgnY0gmlwhLAJIpuEcXVpY4IjjYlzZWNwMjU2azGhAlgxJuF470w86xotNei6ZrsBjMGDDoeNCMmpNmv6JOwfiHN5bmNuZXRzAIN0Y3CCI4yDdWRwgiOM,enr:-MS4QFOwDVgCjJF96tZ8klkz3MeuWFVn-7EbMqTgCj8VphUvJCntrOhDn8FegTF5rntuqu_oD50l7_CsYWfim78BgUIlh2F0dG5ldHOIAGAAAAAAAACEZXRoMpD5eIIkEAAEAP__________gmlkgnY0gmlwhC4EI86EcXVpY4IjjYlzZWNwMjU2azGhAu6jh7rPZEH3NSIWHHolNwZRiw8Ha5G3y82T38tuocLFiHN5bmNuZXRzAIN0Y3CCI4yDdWRwgiOM,enr:-MS4QGN430RzhKlL14ysf-T7zHY5Tko54jKaDGdTELl3sjzyWMgWvZDyFeNzVyJMfa7gbhE4ZYj05pG0JYw4iKwCe45Kh2F0dG5ldHOIgAEAAAAAAACEZXRoMpD5eIIkEAAEAP__________gmlkgnY0gmlwhFjGO9OEcXVpY4IkuYlzZWNwMjU2azGhAvE2sbRv7xB9ELjT9Yw8Km10s-czsUkPfHYMz5UXNT3YiHN5bmNuZXRzAIN0Y3CCJLiDdWRwgiS4
-      - --checkpoint-sync-url=http://46.4.35.206:5002
+      - --boot-nodes=enr:-MS4QFAq65XiKHgPutxlEUddypfto3s9xDCKqtapncKp8FUySmIWv10DDiWr-JhrGTyWzZ5MFRVlIm3Pq-qirKOW6ecFh2F0dG5ldHOIgAEAAAAAAACEZXRoMpD5eIIkEAAEAP__________gmlkgnY0gmlwhJT7fl6EcXVpY4IjjYlzZWNwMjU2azGhA_I84S-8OOYJ1mPqK_9LBo_yADxxrE9_jrKjmZLNZQeIiHN5bmNuZXRzAIN0Y3CCI4yDdWRwgiOM,enr:-MS4QF5WDiIklZTNVnjKhMLCDysyuHjazij18XnUPtzIPK-oEs05dUkPi5gyKDdEW4UBdEnKK1cHF0E3SXzhUjE0sjVQh2F0dG5ldHOIYAAAAAAAAACEZXRoMpD5eIIkEAAEAP__________gmlkgnY0gmlwhLAJIpuEcXVpY4IjjYlzZWNwMjU2azGhAlgxJuF470w86xotNei6ZrsBjMGDDoeNCMmpNmv6JOwfiHN5bmNuZXRzAIN0Y3CCI4yDdWRwgiOM,enr:-MS4QFOwDVgCjJF96tZ8klkz3MeuWFVn-7EbMqTgCj8VphUvJCntrOhDn8FegTF5rntuqu_oD50l7_CsYWfim78BgUIlh2F0dG5ldHOIAGAAAAAAAACEZXRoMpD5eIIkEAAEAP__________gmlkgnY0gmlwhC4EI86EcXVpY4IjjYlzZWNwMjU2azGhAu6jh7rPZEH3NSIWHHolNwZRiw8Ha5G3y82T38tuocLFiHN5bmNuZXRzAIN0Y3CCI4yDdWRwgiOM,enr:-MS4QGN430RzhKlL14ysf-T7zHY5Tko54jKaDGdTELl3sjzyWMgWvZDyFeNzVyJMfa7gbhE4ZYj05pG0JYw4iKwCe45Kh2F0dG5ldHOIgAEAAAAAAACEZXRoMpD5eIIkEAAEAP__________gmlkgnY0gmlwhFjGO9OEcXVpY4IkuYlzZWNwMjU2azGhAvE2sbRv7xB9ELjT9Yw8Km10s-czsUkPfHYMz5UXNT3YiHN5bmNuZXRzAIN0Y3CCJLiDdWRwgiS4,enr:-MS4QGiJjzf2pqxKoSYTx76MMHDVqeZEv364kNISAdUuCimcM08Q-iiQA6FOV6klBQIvaiiU3IcA_Dex_Z4y9H2cdV9xh2F0dG5ldHOIABgAAAAAAACEZXRoMpD5eIIkEAAEAP__________gmlkgnY0gmlwhAAAAACEcXVpY4IjjYlzZWNwMjU2azGhA63B3QlccwRVhU3QANWrqhJmyoQmrdvNBkq0Os7TK62PiHN5bmNuZXRzD4N0Y3CCI4yDdWRwgiOM
+      - --checkpoint-sync-url=http://46.4.35.206:5002/
     logging:
       driver: "json-file"
       options:
